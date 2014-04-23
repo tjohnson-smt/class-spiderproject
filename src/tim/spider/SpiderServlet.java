@@ -1,6 +1,8 @@
 package tim.spider;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -37,11 +39,22 @@ public class SpiderServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Page page = new Page(startingURL);
-		System.out.println(page.getHTML());
+		Page firstPage = new Page(startingURL);
+		
+		Set<Page> pageList = new HashSet<Page>();
+		pageList.add(firstPage);
+		
+		for (int i = 0; i < pageList.size(); i++) {
+			Page page = pageList.iterator().next();
+			
+			System.out.println("Getting Links for Page: " + page.getUrlString());
+			for (String uri : page.getLinksList()) {
+				pageList.add(new Page(startingURL + uri));
+			}
+		}
 		
 		response.setContentType("text/html");
-		request.setAttribute("output", page);
+		request.setAttribute("output", firstPage);
 		RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/include/spiderResults.jsp");
     	rd.forward(request, response);
 	}
