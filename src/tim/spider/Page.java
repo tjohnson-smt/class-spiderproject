@@ -23,14 +23,16 @@ public class Page {
 	/**
 	 * Creates a new page.
 	 * @param baseURL
+	 * @throws Exception 
 	 */
-	public Page(String baseURL) {
+	public Page(String baseURL) throws Exception {
 		try {
 			this.connection = new ConnectionManager(baseURL);
+			savePage();
 			findLinks();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			String msg = "Can't create the page!";
+            throw new Exception(msg);
 		}
 	}
 
@@ -39,11 +41,12 @@ public class Page {
 	 * 
 	 * @return
 	 */
+	@Override
 	public String toString() {
 		StringBuilder output = new StringBuilder();
 		String newLine = "<br />";
 		
-		output.append("<strong>Links found for: ");
+		output.append("<strong>Links found for page: ");
 		output.append(getUrlString());
 		output.append("</strong>");
 		output.append(newLine);
@@ -61,6 +64,7 @@ public class Page {
 	 * 
 	 * @return
 	 */
+	@Override
 	public boolean equals(Object otherObj) {
 		if (otherObj == null) return false;
 		if (this.getClass() != otherObj.getClass()) return false;
@@ -115,5 +119,16 @@ public class Page {
 		};
 		
 		parserDelegator.parse(new StringReader(getHTML()), parserCallback, true);
+	}
+	
+	/**
+	 * Saves a copy of the page to the file system.
+	 * @throws IOException 
+	 */
+	private void savePage() throws IOException {
+		//File outputFile = new File("cache/" + getUrlString().substring(7));
+		//FileOutputStream fileOutputStream = new FileOutputStream(outputFile, true);
+		
+		//connection.getOutputStream().writeTo(fileOutputStream);
 	}
 }

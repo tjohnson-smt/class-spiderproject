@@ -1,8 +1,6 @@
 package tim.spider;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -18,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/SpiderServlet")
 public class SpiderServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private String startingURL = "http://www.siliconmtn.com/";
+	private String domain = "http://www.siliconmtn.com/";
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -39,22 +37,10 @@ public class SpiderServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Page firstPage = new Page(startingURL);
-		
-		Set<Page> pageList = new HashSet<Page>();
-		pageList.add(firstPage);
-		
-		for (int i = 0; i < pageList.size(); i++) {
-			Page page = pageList.iterator().next();
-			
-			System.out.println("Getting Links for Page: " + page.getUrlString());
-			for (String uri : page.getLinksList()) {
-				pageList.add(new Page(startingURL + uri));
-			}
-		}
+		Spider spider = new Spider(domain);
 		
 		response.setContentType("text/html");
-		request.setAttribute("output", firstPage);
+		request.setAttribute("output", spider);
 		RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/include/spiderResults.jsp");
     	rd.forward(request, response);
 	}

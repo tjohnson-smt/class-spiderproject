@@ -3,9 +3,9 @@ package tim.spider;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 
 /**
  * @author tim
@@ -13,23 +13,24 @@ import java.net.URLConnection;
  */
 public class ConnectionManager {
 	private URL baseURL; 
-	private URLConnection urlConnection;
+	private HttpURLConnection urlConnection;
 	private InputStream inputStream;
 	private ByteArrayOutputStream outputStream;
 
 	/**
 	 * Creates a new connection.
 	 * @param baseURL
+	 * @throws Exception 
 	 */
-	public ConnectionManager(String baseURL) {
+	public ConnectionManager(String baseURL) throws Exception {
 		try {
 			validateURL(baseURL);
 			setConnection();
 			setInputStream();
 			setOutputStream();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			String msg = "Can't set up the connection!";
+            throw new Exception(msg);
 		}
 	}
 
@@ -65,10 +66,10 @@ public class ConnectionManager {
 	 * @throws Exception
 	 */
 	private void setConnection() throws Exception {
-		URLConnection urlConn;
+		HttpURLConnection urlConn;
 		
 		try {
-			urlConn = baseURL.openConnection();
+			urlConn = (HttpURLConnection) baseURL.openConnection();
 			urlConn.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:28.0) Gecko/20100101 Firefox/28.0");
 		} catch (IOException e) {
 			String msg = "Can't set a connection for: " + baseURL;
