@@ -1,5 +1,7 @@
 package tim.spider;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.SortedSet;
@@ -100,6 +102,39 @@ public class Page {
 	}
 	
 	/**
+	 * Returns a valid file system path/name, based on the URL string
+	 * @return
+	 */
+	private String getFilePathAndName() {
+		String filePath = getUrlString();
+		if (filePath.endsWith("/")) filePath += "index";
+		
+		switch (filePath.substring(0, 5)) {
+			case "http:": filePath = filePath.substring(7) +  ".htm";	break;
+			case "https": filePath = filePath.substring(8) +  ".htm";	break;
+		}
+		
+		return filePath;
+	}
+	
+	/**
+	 * Returns a valid file name for the page
+	 * @return
+	 */
+	private String getFileName() {
+		return new File(getFilePathAndName()).getName();
+	}
+	
+	/**
+	 * Returns a valid file system path to save the page to
+	 * @return
+	 */
+	private String getFilePath() {
+		int fileIndex = getFilePathAndName().lastIndexOf(getFileName());
+		return getFilePathAndName().substring(0, fileIndex);
+	}
+	
+	/**
 	 * Parses the links in the page.
 	 * 
 	 * @throws IOException
@@ -126,9 +161,13 @@ public class Page {
 	 * @throws IOException 
 	 */
 	private void savePage() throws IOException {
-		//File outputFile = new File("cache/" + getUrlString().substring(7));
-		//FileOutputStream fileOutputStream = new FileOutputStream(outputFile, true);
+		String rootPath = "/home/tim/workspace/spiderproject/WebContent/WEB-INF/cache/";
 		
-		//connection.getOutputStream().writeTo(fileOutputStream);
+		File directory = new File(rootPath + getFilePath());
+		directory.mkdirs();
+
+		File outputFile = new File(rootPath + getFilePath() + getFileName());
+		FileOutputStream fileOutputStream = new FileOutputStream(outputFile, true);
+		connection.getOutputStream().writeTo(fileOutputStream);
 	}
 }
