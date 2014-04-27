@@ -27,10 +27,10 @@ public class Page {
 	 * @param baseURL
 	 * @throws Exception 
 	 */
-	public Page(String baseURL) throws Exception {
+	public Page(String baseURL, String savePath, String cookies) throws Exception {
 		try {
-			this.connection = new ConnectionManager(baseURL);
-			savePage();
+			this.connection = new ConnectionManager(baseURL, cookies);
+			savePage(savePath);
 			findLinks();
 		} catch (Exception e) {
 			String msg = "Can't create the page!";
@@ -84,7 +84,7 @@ public class Page {
 	}
 	
 	/**
-	 * Return's the page's HTML.
+	 * Returns the page's HTML.
 	 * 
 	 * @return
 	 */
@@ -93,7 +93,7 @@ public class Page {
 	}
 
 	/**
-	 * Return's a string representing the page's URL.
+	 * Returns a string representing the page's URL.
 	 * 
 	 * @return
 	 */
@@ -106,15 +106,19 @@ public class Page {
 	 * @return
 	 */
 	private String getFilePathAndName() {
-		String filePath = getUrlString();
-		if (filePath.endsWith("/")) filePath += "index";
+		StringBuilder filePath = new StringBuilder();
+		filePath.append(getUrlString());
 		
-		switch (filePath.substring(0, 5)) {
-			case "http:": filePath = filePath.substring(7) +  ".htm";	break;
-			case "https": filePath = filePath.substring(8) +  ".htm";	break;
+		if (filePath.toString().endsWith("/")) filePath.append("index");
+		filePath.append(".htm");
+		
+		if (filePath.substring(0, 5) == "http:") {
+			filePath.delete(0,7);
+		} else {
+			filePath.delete(0,8);
 		}
-		
-		return filePath;
+
+		return filePath.toString();
 	}
 	
 	/**
@@ -136,6 +140,7 @@ public class Page {
 	
 	/**
 	 * Parses the links in the page.
+	 * For now, we are only concerned about the links starting with a '/'.
 	 * 
 	 * @throws IOException
 	 */
@@ -160,9 +165,7 @@ public class Page {
 	 * Saves a copy of the page to the file system.
 	 * @throws IOException 
 	 */
-	private void savePage() throws IOException {
-		String rootPath = "/home/tim/workspace/spiderproject/WebContent/WEB-INF/cache/";
-		
+	private void savePage(String rootPath) throws IOException {
 		File directory = new File(rootPath + getFilePath());
 		directory.mkdirs();
 
